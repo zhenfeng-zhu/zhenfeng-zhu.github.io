@@ -1,6 +1,6 @@
 baseURL: "https://zhenfeng-zhu.github.io"
 title: "Go Data"
-paginate: 5
+paginate: 10
 theme: PaperMod
 
 enableInlineShortcodes: true
