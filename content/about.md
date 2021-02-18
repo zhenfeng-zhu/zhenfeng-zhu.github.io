@@ -3,8 +3,8 @@ title: "About Me"
 layout: "about"
 # url: "/archives"
 summary: "about"
+disableShare: true
 ---
-
 > 软件工程师
 > - 编程小语种爱好者，精通各种语言的hello world，目前沉迷Clojure、elixir
 > - Get Started工程师，止步于大量框架和包的readme
