@@ -1,5 +1,5 @@
 ---
-title: "Vim折腾"
+title: "小白都能快速上手的Vim配置"
 date: 2021-02-20T09:56:31+08:00
 draft: false
 TocOpen: false
