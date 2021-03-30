@@ -1,157 +1,195 @@
 ---
-date: "2018-06-27 18:10:47"
-title: openfaas-workshop-lab2
+title: "Openfaas Workshop Lab2"
+date: 2021-03-30T09:57:01+08:00
+draft: false
+TocOpen: false
+draft: false
+hidemeta: false
+comments: false
+description: "Desc Text."
+disableHLJS: true
+disableShare: true
+disableHLJS: false
 ---
 
-# Lab2 测试一下
+# 实验 2 - 测试
 
-在开始这个实验之前，首先创建一个新的文件夹：
+<img src="https://github.com/openfaas/media/raw/master/OpenFaaS_Magnet_3_1_png.png" width="500px"></img>
 
-```
+在开始实验之前，先创建一个文件夹：
+
+```sh
 $ mkdir -p lab2 \
    && cd lab2
 ```
 
-## 使用UI界面
+## 使用 UI 门户
 
-你现在可以打开[http://127.0.0.1:8080](http://127.0.0.1:8080/)测试OpenFaaS的UI。如果是在一台LInux虚拟机中部署，将127.0.0.1替换为该虚拟机的ip地址。
+您现在可以测试 OpenFaaS UI：
 
-> 备注：我们使用的是127.0.0.1而不是localhost，因为在一些Linux发行版中IPv4/IPv6出现不兼容。
+如果你已经设置了 `$OPENFAAS_URL` ，请获取 URL，并点开:
 
-我们可以部署一些样例代码来进行测试：
-
+```sh
+echo $OPENFAAS_URL
+http://127.0.0.1:31112
 ```
-faas-cli deploy -f https://raw.githubusercontent.com/openfaas/faas/master/stack.yml
+
+如果还没有设置 `$OPENFAAS_URL` ，那么默认的值通常是： [http://127.0.0.1:8080](http://127.0.0.1:8080).
+
+我们可以部署一些示例函数，然后使用它们进行测试：
+
+```sh
+$ faas-cli deploy -f https://raw.githubusercontent.com/openfaas/faas/master/stack.yml
 ```
 
-![](https://github.com/openfaas/workshop/raw/master/screenshot/markdown_portal.png)
+![](./screenshot/markdown_portal.png)
 
-你可以在UI里面选择Markdown函数进行测试，这个函数将markdown转换为html。
+您可以在用户界面中试用它们，例如 Markdown 函数，它将 Markdown 代码转换成超文本标记语言。
 
-在Request一栏中输入：
+在 _Request_ 字段中输入如下的内容：
 
-```
+```sh
 ## The **OpenFaaS** _workshop_
 ```
 
-点击INVOKE按钮，然后在屏幕下方观察响应。
+现在点击 _Invoke_ ，然后就可以看到响应出现在屏幕的下半部分。
 
-即：
+I.e.
 
-```
+```sh
 <h2>The <strong>OpenFaaS</strong> <em>workshop</em></h2>
 ```
 
-你同时也会发现在其他栏中的值：
+您将会看到如下的字段：
 
-- Status - 函数是否可以运行的状态。如果在UI中的状态不可用，你将不能invoke函数。
-- Replicas - 运行在swarm集群中的函数副本。
-- Image - 发布在docker hub或其他docker仓库中的镜像名字。
-- Invocation count - 5秒更新一次，显示该函数已经被触发的次数。
+- Status - 函数是否准备好运行。在状态显示就绪之前，您将无法从用户界面调用该函数。
+- Replicas - 在集群中运行的函数的副本数量。
+- Image - 发布到 Docker Hub 或 Docker 存储库的 Docker 镜像名称和版本。
+- Invocation count - 这显示了函数被调用的次数，并且每 5 秒更新一次。
 
-点击INVOKE按钮几次，可以看到Invocation count在增加。
+多次点击 _Invoke_ ，就可以看到 _Invocation count_ 在递增。
 
-## 通过函数商店进行部署
+## 通过函数商店部署
 
-你也可以从OpenFaas商店中部署一个函数。这个商店是是社区整理的一些免费函数集合。
+你也可以从 OpenFaaS 商店部署一个函数。这个商店是社区策划的函数集合。
 
-- 点击*Deploy New Function*
-- 点击*From Store*
-- 点击*Figlet*或者从搜索栏中进入*figlet*，然后点击*Deploy*
+- 点击 _Deploy New Function_
+- 点击 _From Store_
+- 点击 _Figlet_ 或者在搜索栏里输入 _figlet_ ，然后点击 _Deploy_
 
-Figlet函数将会在左侧的函数列表中。稍等几分钟，等待函数从Docker Hub中下载。然后就像Markdown函数一样，输入一些文字，点击INVOKE。
+Figlet 函数将会出现在左侧函数列表中，耐心等几分钟，它需要从 docker hub 下载。 下载完成之后，输入一些文本，然后点击 invoke。
 
-一个ASCII的logo将会生成：
+你会看的一个 ASCII logo：
 
-```
+```sh
  _  ___   ___ _  __
 / |/ _ \ / _ (_)/ /
-| | | | | | | |/ / 
-| | |_| | |_| / /_ 
+| | | | | | | |/ /
+| | |_| | |_| / /_
 |_|\___/ \___/_/(_)
 ```
 
-## 学习CLI
+## 学习 CLI
 
-你现在可以测试CLI，但是首先先做一些网关URL的说明：
+你现在可以测试 CLI，但是首先看下网关的 URL：
 
-如果你的网关不是部署在[http://127.0.0.1:8080](http://127.0.0.1:8080/)，那么你需要指定替代的地址。这里有几种方法：
+如果 gateway 没有部署在http://127.0.0.1:8080，你需要按如下的几种方法指定一下：
 
-1. 设置OPENFAAS_URL的环境变量，faas-cli将会在当前shell会话中指向此endpoint。比如export OPENFAAS_URL=http://openfaas.endpoint.com:8080
-2. 使用-g或--gateway指向正确的endpoint：faas deploy --gateway http://openfaas.endpoint.com:8080
-3. 在部署的YAML文件中，改变provider下面的gateway的值。
+1. 设置环境变量`OPENFAAS_URL`，`faas-cli`将会在 shell 会话中使用这个。比如：`export OPENFAAS_URL=http://openfaas.endpoint.com:8080`。这个已经在[实验 1](./lab1.md)中设置好了。
+2. 使用`-g` 或 `--gateway`指定正确的端点：`faas deploy --gateway http://openfaas.endpoint.com:8080`。
+3. 在 YAML 文件中，在`provider:`下修改一下`gateway:`。
 
 ### 列出已经部署的函数
 
-这个命令将会列出已经部署的函数，副本数和调用数。
+这个会显示有多少函数，多少个副本以及调用次数。
 
-```
+```sh
 $ faas-cli list
 ```
 
-你应该可以看到markdown函数和figlet函数以及他们被调用的次数。
+现在尝试使用 verbose 命令
 
-现在试一下verbose参数
-
-```
+```sh
 $ faas-cli list --verbose
 ```
 
 或
 
-```
+```sh
 $ faas-cli list -v
 ```
 
-你现在可以看到函数的docker镜像。
+现在可以在函数旁边看的 Docker 镜像。
 
-### 调用一个函数
+### 调用函数
 
-选择一个faas-cli list命令列出的函数，比如markdown：
+选择`faas-cli list`中看的的函数，比如 `markdown`:
 
-```
+```sh
 $ faas-cli invoke markdown
 ```
 
-现在输入一些文字，按ctrl+d退出。
+然后你会被要求输入一些文本，然后按 Control + D 结束。
 
-也可以使用其他命令，比如echo或者uname -a作为输入，和invoke命令形成管道：
+或者也可以使用`echo` 或 `uname -a`作为调用的输入。
 
-```
+```sh
 $ echo Hi | faas-cli invoke markdown
 
 $ uname -a | faas-cli invoke markdown
 ```
 
-接下来你甚至可以将一个markdown文件转换为HTML文件：
+你甚至可以使用一个 HTML 文件：
 
-```
+```sh
 $ git clone https://github.com/openfaas/workshop \
    && cd workshop
 
 $ cat lab2.md | faas-cli invoke markdown
 ```
 
-### 监控仪表盘
+## 监控面板
 
-OpenFaas使用Prometheus自动监控函数的指标。使用一些免费且开源的软件如 [Grafana](https://grafana.com/)，将这些指标转换为可视化的仪表盘。
+OpenFaas 使用 Prometheus 监控函数的指标。这些指标可以通过[Grafana](https://grafana.com)变成一个可视化的仪表盘。
 
-部署OpenFaaS的Grafana：
+在 OpenFaaS 的 Kubernetes 命名空间下运行 Grafana：
 
+```sh
+kubectl -n openfaas run \
+--image=stefanprodan/faas-grafana:4.6.3 \
+--port=3000 \
+grafana
 ```
-$ docker service create -d \
---name=grafana \
---publish=3000:3000 \
---network=func_functions \
-stefanprodan/faas-grafana:4.6.3
+
+通过 NodePort 暴露：
+
+```sh
+kubectl -n openfaas expose pod grafana \
+--type=NodePort \
+--name=grafana
 ```
 
-服务创建之后，在浏览器中打开Grafana，使用admin/admin登录，然后进入预制的OpenFaaS的仪表盘：
+找到 Grafana 的 node port 地址
 
-<http://127.0.0.1:3000/dashboard/db/openfaas>
+```sh
+$ GRAFANA_PORT=$(kubectl -n openfaas get svc grafana -o jsonpath="{.spec.ports[0].nodePort}")
+$ GRAFANA_URL=http://IP_ADDRESS:$GRAFANA_PORT/dashboard/db/openfaas
+```
 
-![](https://camo.githubusercontent.com/24915ac87ecf8a31285f273846e7a5ffe82eeceb/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4339636145364358554141585f36342e6a70673a6c61726765)
+其中 `IP_ADDRESS` 就是 Kubernetes 的对应 IP。
 
-现在进入[Lab 3](https://github.com/openfaas/workshop/blob/master/lab3.md)
+或者你也可以用端口转发命令，这样就可以在`http://127.0.0.1:3000`Grafana。
 
-未完待续...
+```sh
+$ kubectl port-forward pod/grafana 3000:3000 -n openfaas
+```
+
+如果使用 Kubernetes 1.17 或更高版本，请使用`deploy/grafana` ，而不是用 `pod/` 。
+
+创建服务之后，在浏览器中打开 Grafana，然后输入用户名`admin` 和密码 `admin`登录，并以 `$GRAFANA_URL`找到之前已经做好的 OpenFaaS 仪表盘。
+
+<a href="https://camo.githubusercontent.com/24915ac87ecf8a31285f273846e7a5ffe82eeceb/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4339636145364358554141585f36342e6a70673a6c61726765"><img src="https://camo.githubusercontent.com/24915ac87ecf8a31285f273846e7a5ffe82eeceb/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4339636145364358554141585f36342e6a70673a6c61726765" width="600px" /></a>
+
+_Pictured: example of an OpenFaaS dashboard with Grafana_
+
+现在进入 [实验 3](./lab3.md)
